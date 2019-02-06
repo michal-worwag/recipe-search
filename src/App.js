@@ -7,35 +7,65 @@ import RecipeList from "./components/RecipeList";
 import RecipeDetails from "./components/RecipeDetails";
 
 class App extends Component {
-  state ={
+  state = {
     recipes: recipes,
-    url: "https://www.food2fork.com/api/search?key=33ddbfc44b41e62304b02d0c44f67326",
-    details_id: 35384
+    url:
+      "https://www.food2fork.com/api/search?key=33ddbfc44b41e62304b02d0c44f67326",
+    details_id: 35384,
+    pageIndex: 1
   };
 
-  // async getRecpies() {
-  //   try {
-  //     const data = await fetch(this.state.url);
-  //     const jsonData = await data.json();
+  async getRecpies() {
+    try {
+      const data = await fetch(this.state.url);
+      const jsonData = await data.json();
 
-  //     this.setState({ recipes: jsonData.recipes })
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+      this.setState({ recipes: jsonData.recipes });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  // componentDidMount(){
-  //   this.getRecpies();
-  // }
+  componentDidMount() {
+    this.getRecpies();
+  }
+
+  displayPage = index => {
+    switch (index) {
+      default:
+      case 1:
+        return (
+          <RecipeList
+            recipes={this.state.recipes}
+            handleDetails={this.handleDetails}
+          />
+        );
+      case 0:
+        return (
+          <RecipeDetails
+            id={this.state.details_id}
+            handleIndex={this.handleIndex}
+          />
+        );
+    }
+  };
+
+  handleIndex = index => {
+    this.setState({
+      pageIndex: index
+    });
+  };
+
+  handleDetails = (index, id) => {
+    this.setState({
+      pageIndex: index,
+      details_id: id
+    });
+  };
 
   render() {
-    // console.log(this.state.recipes);
-
     return (
-      <React.Fragment>
-        {/*<RecipeList recipes={this.state.recipes} /> */}
-        <RecipeDetails id={this.state.details_id} />
-      </React.Fragment>
+      <React.Fragment>{this.displayPage(this.state.pageIndex)}</React.Fragment>
     );
   }
 }
